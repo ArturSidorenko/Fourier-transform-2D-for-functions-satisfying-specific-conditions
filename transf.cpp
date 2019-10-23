@@ -38,8 +38,9 @@ int f2c(int n, double hx, double hy, const double *f, double *c) {
 	fill_array(n, hy, gy, func_y);
 
 	for (int i = 0; i < n; i++) {
+		#pragma parallel for
 		for (int j = 0; j < n+1; j++) temp[j] = scal_prod1D(n, hy, f + (n + 1)*j, gy + (n+1)*i, true);
-
+		#pragma parallel for
 		for (int j = 0; j < n-1; j++) c[n*j + i] = scal_prod1D(n, hx, temp, gx + (n + 1)*j);
 	}
 
@@ -60,6 +61,7 @@ int c2f(int n, double hx, double hy, double *f, const double *c) {
 	fill_with_zeros((n + 1)*(n + 1), f);
 
 	//a sophisticated formula
+	#pragma parallel for
 	for (int i = 0; i < n - 1; i++) {
 		for (int l = 0; l < n + 1; l++) {
 			temp = 0;
@@ -94,11 +96,11 @@ void fill_with_zeros(int n, double *a) {
 }
 
 void fill_array(int n, double hx, double hy, double *a, REAL_FUNC_2D f) {
-	for (int i = 0; i < n-1; i++) {
-		for (int j = 0; j < n; j++) a[n*i + j] = f(i*hx, j*hy);
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j <= n; j++) a[(n+1)*i + j] = f(i*hx, j*hy);
 	}
 	//continuation
-	for (int j = 0; j < n; j++) a[(n-1)*n + j] = a[(n-2)*n + j];
+	for (int j = 0; j <= n; j++) a[(n)*(n+1) + j] = a[(n-1)*(n+1) + j];
 }
 
 void fill_array(int n, double h, double* g, SIMPLE_REAL_FUNC f)
@@ -110,32 +112,32 @@ void fill_array(int n, double h, double* g, SIMPLE_REAL_FUNC f)
 //restores function inside the cells of the mesh
 double* restore_function(int n, double hx, double hy, const double *c, int mult) {
     double temp = 0;
-
+	double hx_new = hx / mult;
+	double hy_new = hy / mult;
 
     double *ans;
-    ans = new double[(n*n+n)*mult*mult];
+    ans = new double[(n*mult+1)*(n*mult+1)];
 
-    fill_with_zeros((n + 1)*(n + 1)*mult*mult, ans);
+    fill_with_zeros((n*mult + 1)*(n*mult + 1), ans);
 
     //a sophisticated formula
+
     for (int i = 0; i < n - 1; i++) {
-            for (int l = 0; l < n*mult + 1; l++) {
+            for (int l = 0; l <= n*mult; l++) {
                     temp = 0;
                     for (int j = 0; j < n; j++) {
-                            temp += c[i*(n) + j] * func_y(l*hy/mult, j);
+                            temp += c[i*(n) + j] * func_y(l*hy_new, j);
                     }
 
-                    for (int k = 0; k < (n-0.5)*mult+1; k++) {
-                            ans[(n + 1)*mult*k + l] += temp * func_x(k*hx/mult, i);
+                    for (int k = 0; k <= n*mult; k++) {
+                            ans[(n*mult+1)*k + l] += temp * func_x(k*hx_new, i);
                     }
             }
     }
 
-
-
-
     return ans;
 }
+
 
 
 
