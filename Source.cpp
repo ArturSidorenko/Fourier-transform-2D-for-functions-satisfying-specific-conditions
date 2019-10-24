@@ -28,6 +28,10 @@ void fill_array_dense_mesh(int n, int mult, double hx, double hy, double *a, REA
 
 int main() {
 
+	omp_set_num_threads(4);
+	omp_set_dynamic(0);
+
+
 	int n = 10;
 
 
@@ -203,10 +207,10 @@ double deep_test(int n) {
     fill_array_dense_mesh(n, mult, h, h, f_ext, func2);
 
     f2c(n, hx, hy, f, c);
-	write_table(n + 1, f, "ee.txt");
+	//write_table(n + 1, f, "ee.txt");
     tr = restore_function(n, h, h, c, mult);
 
-	write_table(n*mult + 1, tr, "qq.txt");
+	//write_table(n*mult + 1, tr, "qq.txt");
 	
     double ans = max_deriv(n*mult+1, f_ext, tr);
 

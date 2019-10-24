@@ -17,6 +17,7 @@
 #include<vector>
 #include<omp.h>
 
+
 const double PI = 4 * atan(1);
 
 

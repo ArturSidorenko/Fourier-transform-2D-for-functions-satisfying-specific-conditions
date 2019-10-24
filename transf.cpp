@@ -52,7 +52,7 @@ int f2c(int n, double hx, double hy, const double *f, double *c) {
 }
 
 int c2f(int n, double hx, double hy, double *f, const double *c) {
-	double *gx, *gy, temp = 0;
+	double *gx, *gy;
 	gx = new double[n*n + n];
 	gy = new double[n*n + n];
 
@@ -63,6 +63,7 @@ int c2f(int n, double hx, double hy, double *f, const double *c) {
 	//a sophisticated formula
 	#pragma parallel for
 	for (int i = 0; i < n - 1; i++) {
+		double temp = 0;
 		for (int l = 0; l < n + 1; l++) {
 			temp = 0;
 			for (int j = 0; j < n; j++) {
@@ -111,7 +112,7 @@ void fill_array(int n, double h, double* g, SIMPLE_REAL_FUNC f)
 
 //restores function inside the cells of the mesh
 double* restore_function(int n, double hx, double hy, const double *c, int mult) {
-    double temp = 0;
+    //double temp = 0;
 	double hx_new = hx / mult;
 	double hy_new = hy / mult;
 
@@ -122,7 +123,9 @@ double* restore_function(int n, double hx, double hy, const double *c, int mult)
 
     //a sophisticated formula
 
+	#pragma parallel for
     for (int i = 0; i < n - 1; i++) {
+		double temp = 0;
             for (int l = 0; l <= n*mult; l++) {
                     temp = 0;
                     for (int j = 0; j < n; j++) {
