@@ -10,7 +10,7 @@ double func1(double x, double y) {
 }
 
 double func2(double x, double y) {
-        return exp(x+y)*(-x)*(y-1);
+        return exp(-x+y)*(x)*(y-1);
 }
 
 double unit(double x, double y) {
@@ -116,7 +116,7 @@ void test() {
         int N = 512;
 	double hx, hy;
 	ofstream fout("research.txt");
-	fout << "The research of quality for the function  exp(x+y)(-x)(y-1) \n";
+	fout << "The research of quality for the function  exp(-x+y)(x)(y-1) \n";
 	fout << "  n       err  \n[\n";
 	double * f, *c, *tr;
 
